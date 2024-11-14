@@ -1,11 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
-
-	_ "modernc.org/sqlite"
 )
 
 const (
@@ -97,11 +94,9 @@ func (s ParcelService) Delete(number int) error {
 }
 
 func main() {
-	// настройте подключение к БД
-
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	// создайте объект ParcelStore функцией NewParcelStore
+	store := NewParcelStore("")
 	service := NewParcelService(store)
-
 	// регистрация посылки
 	client := 1
 	address := "Псков, д. Пушкина, ул. Колотушкина, д. 5"

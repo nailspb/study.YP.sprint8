@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"math/rand"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -32,6 +32,7 @@ func getTestParcel() Parcel {
 func TestAddGetDelete(t *testing.T) {
 	// prepare
 	store := NewParcelStore("tests.db")
+	defer store.Close()
 	parcel := getTestParcel()
 
 	// add
@@ -51,15 +52,18 @@ func TestAddGetDelete(t *testing.T) {
 	assert.Equal(t, parcel, p)
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
-	// проверьте, что посылку больше нельзя получить из БД
 	err = store.Delete(id)
 	require.NoError(t, err)
+	// проверьте, что посылку больше нельзя получить из БД
+	_, err = store.Get(id)
+	require.Error(t, err)
 }
 
 // TestSetAddress проверяет обновление адреса
 func TestSetAddress(t *testing.T) {
 	// prepare
 	store := NewParcelStore("tests.db")
+	defer store.Close()
 	parcel := getTestParcel()
 
 	// add
@@ -87,6 +91,7 @@ func TestSetAddress(t *testing.T) {
 func TestSetStatus(t *testing.T) {
 	// prepare
 	store := NewParcelStore("tests.db")
+	defer store.Close()
 	parcel := getTestParcel()
 
 	// add
@@ -100,7 +105,7 @@ func TestSetStatus(t *testing.T) {
 
 	// set status
 	// обновите статус, убедитесь в отсутствии ошибки
-	newStatus := "testStatus"
+	newStatus := ParcelStatusDelivered
 	err = store.SetStatus(id, newStatus)
 	require.NoError(t, err)
 
@@ -115,7 +120,7 @@ func TestSetStatus(t *testing.T) {
 func TestGetByClient(t *testing.T) {
 	// prepare
 	store := NewParcelStore("tests.db")
-
+	defer store.Close()
 	parcels := []Parcel{
 		getTestParcel(),
 		getTestParcel(),
@@ -148,7 +153,7 @@ func TestGetByClient(t *testing.T) {
 	// убедитесь в отсутствии ошибки
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
 	require.NoError(t, err)
-	assert.Equal(t, len(storedParcels), len(parcels))
+	assert.Len(t, storedParcels, len(parcels))
 
 	// check
 	for _, parcel := range storedParcels {

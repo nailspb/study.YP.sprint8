@@ -96,6 +96,7 @@ func (s ParcelService) Delete(number int) error {
 func main() {
 	// создайте объект ParcelStore функцией NewParcelStore
 	store := NewParcelStore("")
+	defer store.Close()
 	service := NewParcelService(store)
 	// регистрация посылки
 	client := 1
